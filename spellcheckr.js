@@ -167,8 +167,8 @@ Spellcheckr.prototype.dom = function() {
 	//commit words to overlay (as spans) as input value changes. If dialog mode, also log the containing sentence, to show that (see ::feedback())
 	this.field.on('input', function() {
 		var html = this.field.val()
-			.replace(/([\w\u0430-\u044f\u0401\-']+)/ig, '<span>$1</span>')
-			.replace(/([\?\.!])/g, '<span class="end-of-sntnc-sign">$1</span>');
+			.replace(/([\w\p{Letter}'-]+)/uig, '<span>$1</span>')
+			.replace(/([\?\.!])/ug, '<span class="end-of-sntnc-sign">$1</span>');
 		this.overlay.html(html);
 	}.bind(this)).trigger('input');
 
@@ -335,7 +335,8 @@ Spellcheckr.prototype.parse_dic = function(words) {
 	if (typeof my_words != 'object') my_words = JSON.parse(my_words);
 	this.dictionary = words.split('|').reduce(function(prev, curr) {
 		prev[curr] = 1;
-		this.alphabet_letters[curr[0]] = 1;
+		let letter = curr.match(/^./u)?.[0]
+		this.alphabet_letters[letter] = 1;
 		return prev;
 	}.bind(this), {});
 	this.dictionary = $.extend(this.dictionary, my_words);
@@ -415,7 +416,7 @@ Spellcheckr.prototype.get_suggestions = function(lookup) {
 	if (this.bad_words_to_suggestions_map[lookup]) return this.bad_words_to_suggestions_map[lookup];
 
 	//...method 1: iteratively shave off a letter - this handles words misspelt through an added latter e.g. rabbitr => rabbit, rabbi
-	let word_arr = lookup.split(/(?=.)/),
+	let word_arr = lookup.split(/(?=.)/u),
 		curLetters = word_arr.slice( 0 );
 	while (curLetters.length > 2) {
 		if (this.dictionary[curLetters.join('')]) suggestions[curLetters.join('')] = 1;
@@ -423,24 +424,24 @@ Spellcheckr.prototype.get_suggestions = function(lookup) {
 	}
 
 	//...method 2: check for extraneous letters within the word. Iteratively remove each letter and look up, e.g. rabybit => rabbit
-	for (var g=0; g<lookup.length; g++) {
-		word = lookup.substr(0, g)+lookup.substr(g+1);
+	for (var g=0; g<word_arr.length; g++) {
+		word = word_arr.slice(0, g).concat(word_arr.slice(g+1)).join('');
 		if (this.dictionary[word]) suggestions[word] = 1;
 	}
 
 	//...method 3: check for missing or errneous letters. Iteratively add/replace a letter (try each of the alphabet's letters) at each position,
 	//e.g. rabit => rabbit and rabyit => rabbit
-	for (var g=0; g<lookup.length; g++)
+	for (var g=0; g<word_arr.length; g++)
 		for (var letter in this.alphabet_letters) {
-			word = lookup.substr(0, g)+letter+lookup.substr(g);
-			word2 = lookup.substr(0, g)+letter+lookup.substr(g+1);
+			word = word_arr.slice(0, g).concat(letter).concat(word_arr.slice(g)).join('');
+			word2 = word_arr.slice(0, g).concat(letter).concat(word_arr.slice(g+1)).join('');
 			if (this.dictionary[word]) suggestions[word] = 1;
 			if (this.dictionary[word2]) suggestions[word2] = 1;
 		}
 
 	//...method 4: check for neighbouring words the wrong way round, e.g. rabbti => rabbit
 	for (var g=0; g<lookup.length-1; g++) {
-		word = lookup.substr(0, g)+lookup[g+1]+lookup[g]+lookup.substr(g+2);
+		word = word_arr.slice(0, g).concat(word_arr.slice(g,g+2).reverse()).concat(word_arr.slice(g+2)).join('');
 		if (this.dictionary[word]) suggestions[word] = 1;
 	}
 
