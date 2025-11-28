@@ -1,19 +1,20 @@
 <!doctype html><!--⇆--><html lang=en-shaw><meta charset=utf-8><title>𐑖𐑱𐑝𐑾𐑯 𐑕𐑐𐑧𐑤-𐑗𐑧𐑒𐑼</title>
 <script src="//cdnjs.cloudflare.com/ajax/libs/jquery/3.7.1/jquery.min.js" integrity="sha512-v2CJ7UaYy4JwqLDIrZUI/4hqeoQieOmAZNXBeQyjo21dadnwR+8ZaIJVT8EE2iyI61OV8e6M8PP2/4hpQINQ/g==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+<meta name=viewport content="width=device-width,initial-scale=1">
 <link rel=stylesheet href=spellcheckr.css><script src=spellcheckr.js></script>
 <textarea autofocus></textarea>
 <style>
 *{box-sizing:border-box}
 html{margin:auto;max-width:60em}body{margin:.5em 1em}
 html,.spellcheckr-tools a,select,option{font:1em/1 Inter Alia,sans-serif}
-textarea{width:100%;min-height:5em;font:inherit}
+textarea{width:100%;font:inherit;resize:vertical!important;height:calc(100dvh - 9rem)}
 </style>
 <script>
   "use strict"
   var s = new Spellcheckr({
     field: "textarea",
     mode: "both",
-    ui_display: "dialog",
+    ui_display: "inline",
     lang: "𐑦𐑙𐑜𐑤𐑦𐑖 (·𐑮𐑰𐑛𐑤𐑧𐑒𐑕, 𐑚𐑭𐑔)",
     dictionaries: {
       "𐑦𐑙𐑜𐑤𐑦𐑖 (·𐑮𐑰𐑛𐑤𐑧𐑒𐑕, 𐑚𐑭𐑔)": "dic.aa.txt",
