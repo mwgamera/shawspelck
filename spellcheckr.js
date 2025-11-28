@@ -145,6 +145,15 @@ Spellcheckr.prototype.dom = function() {
 		whiteSpace: this.field.css('white-space')
 	}).insertAfter(this.field);
 
+	try {
+		new ResizeObserver(ent => {
+			this.overlay.css({
+				width: this.field.css('width'),
+				height: this.field.css('height'),
+			});
+		}).observe(this.field.get(0));
+	} catch (e) { console.error(e) }
+
 	//hide field background and text so overlay shows through
 	this.field[0].style.color = this.field[0].style.background = 'transparent';
 
