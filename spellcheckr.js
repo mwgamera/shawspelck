@@ -19,7 +19,7 @@ var Spellcheckr = function(params) { $(function() {
 		return console.error('Specllcheckr - no dictionaries specified to @dictionaries');
 
 	//log some grammatical words that there's no point checking, to boost performance
-	this.grammatical_words = ['of', 'in', 'the', 'a', 'he', 'she', 'him', 'her', 'he', 'they', 'we', 'at', 'under', 'over', 'off', 'on', 'with', 'for', 'there', 'this', 'that', 'those', 'these', 'with', 'up', 'down', 'who', 'what', 'when', 'where', 'why', 'while'];
+	this.grammatical_words = ['𐑝', '𐑦𐑯', '𐑞', '𐑩', '𐑩𐑯', '𐑣𐑰', '𐑖𐑰', '𐑣𐑦𐑥', '𐑣𐑻', '𐑞𐑱', '𐑢𐑰', '𐑨𐑑', '𐑳𐑯𐑛𐑼', '𐑴𐑝𐑼', '𐑪𐑓', '𐑪𐑯', '𐑢𐑦𐑞', '𐑓', '𐑞𐑺', '𐑞𐑦𐑕', '𐑞𐑨𐑑', '𐑞𐑴𐑟', '𐑞𐑰𐑟', '𐑳𐑐', '𐑛𐑬𐑯', '𐑣𐑵', '𐑢𐑪𐑑', '𐑢𐑧𐑯', '𐑢𐑺', '𐑢𐑲', '𐑢𐑲𐑤', '𐑯', '𐑑', '𐑦𐑑', '𐑦𐑟', '𐑢𐑪𐑟', '𐑲', '𐑿', '𐑚𐑰', '𐑚𐑲', '𐑸', '𐑣𐑨𐑝', '𐑯𐑪𐑑', '𐑚𐑳𐑑', '𐑣𐑨𐑛', '𐑣𐑦𐑟'];
 
 	//try to ensure no native spellchecker or similar functionality coming from browser
 	['autocomplete', 'autocorrect', 'autocapitalize', 'spellcheck'].forEach(function(attr) {
@@ -31,7 +31,7 @@ var Spellcheckr = function(params) { $(function() {
 	this.mode = this.mode || 'ui';
 	if (['ui', 'contextual', 'both'].indexOf(this.mode) == -1) return console.error(err_tmplt.replace('{param}', 'mode'));
 	this.ui_display = this.ui_display || 'popup';
-	if (['dialog', 'inline'].indexOf(this.ui_display) == -1) return console.error(err_tmplt.replace('{param}', 'ui_display')); 
+	if (['dialog', 'inline'].indexOf(this.ui_display) == -1) return console.error(err_tmplt.replace('{param}', 'ui_display'));
 	this.ls_key = 'spellcheckr_dic_'+this.lang;
 	this.change_or_ignore_all = [];
 	this.specify_other = {};
@@ -176,7 +176,7 @@ Spellcheckr.prototype.dom = function() {
 	//commit words to overlay (as spans) as input value changes. If dialog mode, also log the containing sentence, to show that (see ::feedback())
 	this.field.on('input', function() {
 		var html = this.field.val()
-			.replace(/([\w\p{Letter}'-]+)/uig, '<span>$1</span>')
+			.replace(/([\w\p{Letter}\u2E30\u2060\uFE00'-]+)/uig, '<span>$1</span>')
 			.replace(/([\?\.!])/ug, '<span class="end-of-sntnc-sign">$1</span>');
 		this.overlay.html(html);
 	}.bind(this)).trigger('input');
@@ -192,7 +192,7 @@ Spellcheckr.prototype.dom = function() {
 	}
 
 	//on textarea scroll, scroll overlay
-	this.field.on('scroll input', this.onScrollCallback = () => 
+	this.field.on('scroll input', this.onScrollCallback = () =>
 		this.overlay[0].scrollTop = this.field[0].scrollTop
 	);
 
@@ -227,7 +227,7 @@ Spellcheckr.prototype.dom = function() {
 	this.ui.on('click', '.ignore, .ignore-all', function(evt, is_from_contextual) {
 		this.curr_bad_word_el.removeClass('problem');
 		if (evt && $(evt.target).is('.ignore-all') || is_from_contextual == 'all') {
-			this.curr_bad_word_el.siblings().filter(function(i, el) { return $(el).text() == this.curr_bad_word; }.bind(this)).removeClass('problem'); 
+			this.curr_bad_word_el.siblings().filter(function(i, el) { return $(el).text() == this.curr_bad_word; }.bind(this)).removeClass('problem');
 			this.change_or_ignore_all.push(!this.case_sensitive ? this.curr_bad_word.toLowerCase() : this.curr_bad_word);;
 		} else
 			this.curr_bad_word_el.addClass('ignore-single-instance');
@@ -324,7 +324,7 @@ Spellcheckr.prototype.load_dic = function(flush) {
 	if (!localStorage[this.ls_key] || flush || !this.allow_storage) {
 		var no_cache_suffix = location.search.indexOf('spellcheck_flush=1') == -1 ? '' : '?r='+Math.random();
 		$.get(this.dictionaries[this.lang]+no_cache_suffix)
-			.done(function(words) {				
+			.done(function(words) {
 				if (this.allow_storage) localStorage[this.ls_key] = words.toLowerCase();
 				this.parse_dic(words.toLowerCase());
 			}.bind(this))
@@ -423,6 +423,59 @@ Spellcheckr.prototype.get_suggestions = function(lookup) {
 
 	//already cached this word's suggestions?
 	if (this.bad_words_to_suggestions_map[lookup]) return this.bad_words_to_suggestions_map[lookup];
+
+	// 0: Shavian-specific, don't try others if these succeed
+	for (let w of (function*(w){
+		let common = {"𐑞𐑩":["𐑞","𐑞𐑺"],"𐑞𐑦":["𐑞"],"𐑷𐑝":["𐑝"],"𐑪𐑝":["𐑝"],"𐑩𐑝":["𐑝","𐑣𐑨𐑝"],"𐑨𐑯𐑛":["𐑯"],"𐑩𐑯𐑛":["𐑯"],"𐑯𐑛":["𐑯"],"𐑱":["𐑩"],"𐑑𐑩":["𐑑"],"𐑦":["𐑦𐑑","𐑲"],"𐑢𐑩𐑟":["𐑢𐑪𐑟"],"𐑓𐑩":["𐑓"],"𐑓𐑼":["𐑓"],"𐑘𐑩":["𐑿","𐑘𐑹","𐑘𐑧𐑩"],"𐑘𐑫":["𐑿"],"𐑣𐑦":["𐑣𐑰"],"𐑖𐑦":["𐑖𐑰"],"𐑚𐑦":["𐑚𐑰"],"𐑞𐑩𐑑":["𐑞𐑨𐑑"],"𐑞𐑑":["𐑞𐑨𐑑"],"𐑩𐑑":["𐑨𐑑"],"𐑚𐑩𐑑":["𐑚𐑳𐑑"],"𐑓𐑮𐑩𐑥":["𐑓𐑮𐑪𐑥"],"𐑓𐑮𐑳𐑥":["𐑓𐑮𐑪𐑥"],"𐑓𐑮𐑭𐑥":["𐑓𐑮𐑪𐑥"],"𐑣𐑩𐑛":["𐑣𐑨𐑛"],"𐑩𐑛":["𐑣𐑨𐑛","𐑢𐑫𐑛"],"𐑢𐑦":["𐑢𐑰"],"𐑨𐑯":["𐑩𐑯"],"𐑧𐑯":["𐑩𐑯"],"𐑢𐑼":["𐑢𐑻"],"𐑢𐑩":["𐑢𐑻"],"𐑣𐑩𐑝":["𐑣𐑨𐑝"],"𐑣𐑩𐑟":["𐑣𐑨𐑟"],"𐑩𐑟":["𐑨𐑟","𐑣𐑨𐑟"],"𐑢𐑩𐑛":["𐑢𐑫𐑛"],"𐑢𐑩𐑑":["𐑢𐑪𐑑"],"𐑢𐑳𐑑":["𐑢𐑪𐑑"],"𐑣𐑢𐑪𐑑":["𐑢𐑪𐑑"],"𐑣𐑢𐑳𐑑":["𐑢𐑪𐑑"],"𐑞𐑼":["𐑞𐑺"],"𐑒𐑩𐑯":["𐑒𐑨𐑯"],"𐑒𐑧𐑯":["𐑒𐑨𐑯"],"𐑣𐑼":["𐑣𐑻"],"𐑼":["𐑣𐑻"],"𐑻":["𐑣𐑻"],"𐑞𐑩𐑥":["𐑞𐑧𐑥"],"𐑩𐑥":["𐑨𐑥","𐑞𐑧𐑥"],"𐑕𐑩𐑥":["𐑕𐑳𐑥"],"𐑒𐑩𐑛":["𐑒𐑫𐑛"],"𐑑𐑫":["𐑑","𐑑𐑵"],"𐑦𐑯𐑑𐑫":["𐑦𐑯𐑑𐑵"],"𐑦𐑯𐑑𐑩":["𐑦𐑯𐑑𐑵"],"𐑘𐑼":["𐑘𐑹","𐑘𐑧𐑩"],"𐑘𐑻":["𐑘𐑹"],"𐑘𐑫𐑼":["𐑘𐑹"],"𐑥𐑦":["𐑥𐑰"],"𐑖𐑩𐑛":["𐑖𐑫𐑛"],"𐑞𐑩𐑯":["𐑞𐑨𐑯"],"𐑥𐑩𐑕𐑑":["𐑥𐑳𐑕𐑑"],"𐑥𐑩𐑕":["𐑥𐑳𐑕𐑑"],"𐑛𐑩𐑟":["𐑛𐑳𐑟"],"𐑩𐑕":["𐑳𐑕"],"𐑕":["𐑳𐑕"],"𐑥":["𐑨𐑥"],"𐑖𐑩𐑤":["𐑖𐑨𐑤"],"𐑟":["𐑦𐑟"],"𐑚":["𐑚𐑰"],"𐑢":["𐑢𐑦𐑞"],"𐑣":["𐑣𐑰"],"𐑮":["𐑸"],"𐑛":["𐑛𐑵"],"𐑢𐑟":["𐑢𐑪𐑟"],"𐑣𐑝":["𐑣𐑨𐑝"],"𐑯𐑑":["𐑯𐑪𐑑"],"𐑞𐑕":["𐑞𐑦𐑕"],"𐑚𐑑":["𐑚𐑳𐑑"],"𐑓𐑥":["𐑓𐑮𐑪𐑥"],"𐑣𐑛":["𐑣𐑨𐑛"],"𐑣𐑟":["𐑣𐑨𐑟"],"𐑚𐑯":["𐑚𐑰𐑯","𐑚𐑦𐑯"],"𐑢𐑮":["𐑢𐑻"],"𐑢𐑛":["𐑢𐑫𐑛"],"𐑢𐑑":["𐑢𐑪𐑑"],"𐑒𐑯":["𐑒𐑨𐑯"],"𐑞𐑥":["𐑞𐑧𐑥"],"𐑕𐑥":["𐑕𐑳𐑥"],"𐑒𐑛":["𐑒𐑫𐑛"],"𐑖𐑛":["𐑖𐑫𐑛"],"𐑞𐑯":["𐑞𐑧𐑯","𐑞𐑨𐑯"],"𐑛𐑟":["𐑛𐑳𐑟"],"𐑖𐑤":["𐑖𐑨𐑤"]};
+		for (let c of common[w]||[])
+			yield c;
+		yield w=w.replace(/\u2060/ug, '');
+		yield w=w.replace(/^⸰/ug, '⸰\u2060');
+		yield w=w.replace(/𐑾𐑮/ug, '𐑽');
+		yield w=w.replace(/𐑘𐑵/ug, '𐑿');
+		yield w=w.replace(/𐑭𐑮/ug, '𐑸');
+		yield w=w.replace(/𐑷𐑮/ug, '𐑹');
+		yield w=w.replace(/𐑩𐑮/ug, '𐑼');
+		yield w.replace(/𐑽$/u, '𐑦𐑼'); // AJC
+		yield w.replace(/𐑼/u, '𐑩𐑮'); // 𐑦𐑯𐑓𐑮𐑩𐑮𐑧𐑛
+		yield w=w.replace(/^𐑢𐑣/u, '𐑢');
+		yield w=w.replace(/^𐑢𐑮/u, '𐑮');
+		yield w=w.replace(/𐑻𐑮/ug, '𐑻');
+		yield w=w.replace(/𐑰𐑙/ug, '𐑦𐑙');
+		yield w=w.replace(/𐑱𐑙/ug, '𐑨𐑙');
+		yield w=w.replace(/𐑖𐑗𐑮/ug, '𐑕𐑑𐑮');
+		yield w.replace(/𐑗𐑮/ug, '𐑑𐑮');
+		yield w.replace(/𐑡𐑮/ug, '𐑛𐑮');
+		yield w.replace(/𐑰$|𐑰(?=[𐑦𐑰𐑧𐑱𐑨𐑲𐑩𐑼𐑳𐑪𐑴𐑫𐑵𐑬𐑶𐑭𐑸𐑷𐑹𐑺𐑻𐑾𐑽])/ug, '𐑦');
+		yield w.replace(/(?<=^.)𐑦$/u, '𐑰');
+		yield w.replace(/𐑼𐑮/ug, '𐑻');
+		yield w.replace(/𐑴𐑮/ug, '𐑹');
+		yield w.replace(/𐑰𐑼/ug, '𐑽');
+		yield w.replace(/𐑰𐑩/ug, '𐑾');
+		yield w.replace(/𐑦𐑘/ug, '𐑰');
+		yield w.replace(/𐑧𐑘/ug, '𐑱');
+		yield w.replace(/𐑨𐑘/ug, '𐑲');
+		yield w.replace(/𐑪𐑘/ug, '𐑶');
+		yield w.replace(/𐑰𐑘/ug, '𐑰');
+		yield w.replace(/𐑭𐑘/ug, '𐑲');
+		yield w.replace(/𐑷𐑘/ug, '𐑶');
+		yield w.replace(/𐑨𐑢/ug, '𐑬');
+		yield w.replace(/𐑫𐑢/ug, '𐑵');
+		yield w.replace(/𐑩𐑢/ug, '𐑴');
+		yield w.replace(/𐑩𐑢/ug, '𐑵');
+		yield w.replace(/𐑩𐑢/ug, '𐑫');
+		yield w.replace(/𐑭𐑢/ug, '𐑬');
+		yield w.replace(/𐑵𐑢/ug, '𐑵');
+		yield w.replace(/𐑪𐑢/ug, '𐑷𐑤');
+		yield w.replace(/𐑷𐑢/ug, '𐑷𐑤');
+	})(lookup)) {
+		if (!this.dictionary[w]) continue;
+		suggestions[w] = 1;
+	}
+	if (Object.keys(suggestions).length) {
+		this.bad_words_to_suggestions_map[lookup] = suggestions;
+		return suggestions;
+	}
 
 	//...method 1: iteratively shave off a letter - this handles words misspelt through an added latter e.g. rabbitr => rabbit, rabbi
 	let word_arr = lookup.split(/(?=.)/u),
