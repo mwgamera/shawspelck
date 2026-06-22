@@ -405,7 +405,7 @@ Spellcheckr.prototype.Spellcheckr = function() {
 
 		//begin feedback if problems found else notify all OK
 		console.log('Spellcheckr - result', this.problem_words);
-		this.problem_words.length ? this.feedback() : alert('No spelling errors found!');
+		this.problem_words.length ? this.feedback() : alert('✅ 𐑯𐑴 𐑕𐑐𐑧𐑤𐑦𐑙 𐑧𐑮𐑩𐑮𐑟 𐑓𐑬𐑯𐑛! 💯');
 
 	}.bind(this)); }.bind(this));
 };

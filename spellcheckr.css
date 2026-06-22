@@ -1,18 +1,55 @@
+
+  :root {
+  --background: lightgray;
+  --text: black;
+  --accent: darkturquoise;
+  --highlight: crimson;
+  --frame: moccasin;
+
+  }
+
+@media (prefers-color-scheme:dark) {
+  :root {
+  --background: black;
+  --text: lightgray;
+  --accent: turquoise;
+  --highlight: crimson;
+  --frame: darkslategray;
+  }
+}
+
+body {
+  background: var(--background);
+  background: linear-gradient(var(--background), var(--frame));
+  scrollbar-color: var(--frame) var(--background);
+}
+
+textarea {
+  background: var(--background);
+  color: var(--text);
+  margin-top: 1rem;
+  overflow-x: hidden;
+}
+
+.active-problem {
+  color: var(--highlight);
+}
+
 /* wrapper and field */
 .spellcheckr-wrapper { position: relative; }
-.spellcheckr-wrapper textarea { position: relative; z-index: 1; caret-color: #222; resize: none; padding: 0 !important; }
-.spellcheckr-wrapper textarea::-webkit-input-placeholder {color: #222; }
-.spellcheckr-wrapper textarea::-moz-placeholder {color: #222; } /* Firefox 19+ */
-.spellcheckr-wrapper textarea:-moz-placeholder {color: #222; } /* Firefox 18- */
-.spellcheckr-wrapper textarea:-ms-input-placeholder { color: #222; }
+.spellcheckr-wrapper textarea { position: relative; z-index: 1; caret-color: var(--accent); resize: none; padding: 0 !important; }
+.spellcheckr-wrapper textarea::-webkit-input-placeholder {color: var(--accent); }
+.spellcheckr-wrapper textarea::-moz-placeholder {color: var(--accent); } /* Firefox 19+ */
+.spellcheckr-wrapper textarea:-moz-placeholder {color: var(--accent); } /* Firefox 18- */
+.spellcheckr-wrapper textarea:-ms-input-placeholder { color: var(--accent); }
 
 /* tools */
 .spellcheckr-tools { margin-top: .65em; position: relative; display: inline-block; }
 .spellcheckr-wrapper:not([data-ui-mode]) .spellcheckr-tools { display: none; }
-.spellcheckr-wrapper.active .spellcheckr-tools { border: solid 1px #d5d5d5; background: #f4f4f4; padding: 1em; }
+.spellcheckr-wrapper.active .spellcheckr-tools { border: solid 1px var(--frame); background: var(--background); padding: 1em; }
 .spellcheckr-tools * { font-size: .93em; line-height: 1em; }
-.spellcheckr-tools a { background: #d3d3d3; color: #333; padding: .5em .65em; font-weight: normal; font-family: lato; border: none; cursor: pointer; text-decoration: none; }
-.spellcheckr-tools a:hover { background: #ddd; }
+.spellcheckr-tools a { background: var(--background); color: var(--text); padding: .5em .65em; font-weight: normal; font-family: lato; border: 1px solid var(--frame); border-radius: 3px; cursor: pointer; text-decoration: none; }
+.spellcheckr-tools a:hover { background: var(--frame); }
 .spellcheckr-tools select, .spellcheckr-tools input { padding: .35em .65em; }
 
 /* hidden bits until container active */
@@ -40,14 +77,15 @@
 .spellcheckr-tools .row2 { margin-top: 1em; }
 
 /* ...row 1 (and row1b, for dialog only) */
-.spellcheckr-wrapper .row1b { background: white; border: solid 1px #dfdfdf; padding: 1em; }
+.spellcheckr-wrapper .row1b { background: var(--background); border: solid 1px var(--frame); padding: 1em; }
 .spellcheckr-tools .do { margin-right: 1em; }
+.spellcheckr-tools .do:hover {  background-color: var(--accent);  color: var(--background);}
 .spellcheckr-wrapper.active .do { display: none; }
 .spellcheckr-tools .lang { margin-right: 1em; }
 .spellcheckr-tools .row1 a:not(.do) { float: right; }
 .spellcheckr-tools .row1 span { margin-right: 1em; }
-.spellcheckr-tools .close { background: #DA4949; margin-left: 1em; color: #fff; font-weight: bold; }
-.spellcheckr-tools .close:hover { background: #eA5959; }
+.spellcheckr-tools .close { background: var(--frame); margin-left: 1em; color: #fff; font-weight: bold; }
+.spellcheckr-tools .close:hover {   background-color: var(--accent);  color: var(--background);}
 
 /* ...row 2 */
 .spellcheckr-tools .row2 > *:not(:last-child) { margin-right: 1em; }
@@ -62,7 +100,7 @@
 .spellcheckr-wrapper[data-ui-dialog] .suggestions { height: 200px; }
 
 /* close */
-.spellcheckr-tools > a { position: absolute; right: .65em; top: .65em; color: #E43137; }
+.spellcheckr-tools > a { position: absolute; right: .65em; top: .65em; color: var(--text); }
 
 /* field overlay during spellcheck */
 .spellcheckr-overlay { position: absolute; left: 0; top: 0; z-index: 0; overflow: auto; }
@@ -72,7 +110,7 @@
 .spellcheckr-wrapper .problem { position: relative; display: inline-block; z-index: 1; }
 
 /* contextual mode - underlined bad words */
-.spellcheckr-wrapper[data-contextual-mode] .spellcheckr-overlay .problem::before { border-bottom: solid 2px #DA4949; }
+.spellcheckr-wrapper[data-contextual-mode] .spellcheckr-overlay .problem::before { border-bottom: solid 2px var(--highlight); }
 
 /* button mode - highlighted bad words during feedback */
 .spellcheckr-overlay .problem::before, .spellcheckr-wrapper .row1b span::before { content: ''; display: block; position: absolute; left: -3px; top: -1px; width: calc(100% + 6px); height: calc(100% + 3px); opacity: .4; z-index: -1; box-sizing: border-box; }
