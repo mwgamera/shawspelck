@@ -53,6 +53,10 @@ var Spellcheckr = function(params) { $(function() {
 		restart: 'Restart',
 		specify: '...other (specify)',
 		no_suggestions: '(no suggestions)',
+		enter_replacement: 'Enter a replacement',
+		please_fix: 'Please fix spelling errors before continuing',
+		no_errors: 'No spelling errors found!',
+		no_replacement: 'Spellcheck - you must choose a replacement option',
 	}, this.labels || {});
 
 	//establish default lang, and that it corresponds to a passed dictionary
@@ -291,7 +295,7 @@ Spellcheckr.prototype.dom = function() {
 			case 'ignore': this.ui.find('.ignore').trigger('click', 1); break;
 			case 'ignore-all': this.ui.find('.ignore').trigger('click', 'all'); break;
 			case 'add-to-dic': this.ui.find('.add-to-dic').trigger('click', 1); break;
-			case 'specify': this.curr_bad_word_el.text(prompt('Enter a replacement', this.curr_bad_word) || this.curr_bad_word); break;
+			case 'specify': this.curr_bad_word_el.text(prompt(this.labels.enter_replacement, this.curr_bad_word) || this.curr_bad_word); break;
 			case 'replace': this.curr_bad_word_el.text($(evt.target).text()).removeClass('problem'); break;
 		}
 		console.log(this.spellcheckr_cm.data('suggestions'));
@@ -303,7 +307,7 @@ Spellcheckr.prototype.dom = function() {
 	if (this.prevent_submit) this.field.closest('form').on('submit', function(evt) {
 		if ((this.mode != 'ui' && this.overlay.find('.problem').length)) {
 			evt.preventDefault();
-			alert('Please fix spelling errors before continuing');
+			alert(this.labels.please_fix);
 		}
 	}.bind(this));
 
@@ -405,7 +409,7 @@ Spellcheckr.prototype.Spellcheckr = function() {
 
 		//begin feedback if problems found else notify all OK
 		console.log('Spellcheckr - result', this.problem_words);
-		this.problem_words.length ? this.feedback() : alert('No spelling errors found!');
+		this.problem_words.length ? this.feedback() : alert(this.labels.no_errors);
 
 	}.bind(this)); }.bind(this));
 };
@@ -552,7 +556,7 @@ Spellcheckr.prototype.feedback = function() {
 	//...build suggestion options - include any custom replacements for this word seen previously
 	if (this.specify_other[this.curr_bad_word]) this.specify_other[this.curr_bad_word].forEach(function(prev_choice) { obj.suggestions.push(prev_choice); });
 	for (var k=0; k<obj.suggestions.length; k++) $('<option />', {text: obj.suggestions[k]}).insertAfter(ins_after);
-	if (!dd.children(':not([value=""])').length) $('<option />', {text: '(no suggestions)', value: ''}).insertAfter(ins_after);
+	if (!dd.children(':not([value=""])').length) $('<option />', {text: this.labels.no_suggestions, value: ''}).insertAfter(ins_after);
 	dd.children(':first').prop('selected', 1);
 
 };
@@ -565,7 +569,7 @@ Spellcheckr.prototype.get_repl = function() {
 
 	//establish replacement choice
 	var input = this.ui.find('input:visible'), ret = input.val() || this.ui.find('.suggestions').val();
-	if (!ret) alert('Spellcheck - you must choose a replacement option');
+	if (!ret) alert(this.labels.no_replacement);
 
 	//if specified custom choice, remember it so if we meet this word again later (and change-all not chosen), we can suggest same choice
 	if (input.length) {
